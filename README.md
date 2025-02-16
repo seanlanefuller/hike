@@ -1,5 +1,8 @@
 An ollama AI is playing a text adventure along with you.
 I only have DeepSeek-r1 on my PC right now because it is small.
+The code uses the all-in-one hpp ollama API.
+https://github.com/jmont-dev/ollama-hpp
+You must have ollama installed and a model downloaded.
 You can enter commands or allow the AI to choose what to do.
 I want to keep developing this and adding other commands and activities.
 I think it would be awesome to have two AIs meet, etc.
