@@ -1,4 +1,4 @@
-The an ollama AI is playing a text adventure along with you.
+An ollama AI is playing a text adventure along with you.
 I only have DeepSeek-r1 on my PC right now because it is small.
 You can enter commands or allow the AI to choose what to do.
 I want to keep developing this and adding other commands and activities.
