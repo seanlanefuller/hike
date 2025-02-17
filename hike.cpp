@@ -17,15 +17,6 @@ using namespace std;
 
 bool fullAI = false;
 
-// Structure to hold the read and write handles
-struct PipeHandles {
-    int readPipe;
-    int writePipe;
-    int originalReadPipe; // Store original read fd
-    int originalWritePipe; // Store original write fd
-    pid_t pid;
-};
-
 ollama::response reply;
 bool firstTime = true;
 
