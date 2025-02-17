@@ -15,6 +15,8 @@
 
 using namespace std;
 
+bool fullAI = false;
+
 // Structure to hold the read and write handles
 struct PipeHandles {
     int readPipe;
@@ -26,6 +28,44 @@ struct PipeHandles {
 
 ollama::response reply;
 bool firstTime = true;
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+
+std::string findLastWordInstance(const std::string& text, const std::vector<std::string>& words) {
+    if (text.empty() || words.empty()) {
+        return "";
+    }
+
+    std::string lastFoundWord = "";
+    size_t lastFoundPosition = std::string::npos;
+
+    for (const std::string& word : words) {
+        size_t currentPosition = text.rfind(word);
+        while (currentPosition != std::string::npos) {
+            if (lastFoundPosition == std::string::npos || currentPosition > lastFoundPosition) { //Correct condition
+                lastFoundPosition = currentPosition;
+                lastFoundWord = word;
+            }
+            if (currentPosition == 0) break; // Avoid infinite loop if word is at the beginning
+            currentPosition = text.rfind(word, currentPosition - 1); // Crucial fix: Search *before* the current position
+        }
+    }
+
+    return lastFoundWord;
+}
+
+std::string extractCommand(std::string text) {
+    std::transform(text.begin(), text.end(), text.begin(), ::tolower);
+    std::vector<std::string> words = {"north", "south", "east", "west"};
+    std::string lastWord = findLastWordInstance(text, words);
+    cout << "lastword = ";
+    cout << lastWord << endl;
+
+    return lastWord;
+}
 
 std::string ai(std::string query) {
 	std::string model = "deepseek-r1";
@@ -273,14 +313,17 @@ int main() {
 		for (const auto& [direction, nextArea] : areas[currentArea].exits) {
 			cout << direction << " ";
 			fullQuery += direction;
-			fullQuery += ". ";
+			fullQuery += ", ";
 		}
 		cout << endl;
 
 		cout << "Enter direction (or quit): ";
 		fullQuery += " Enter direction (or quit) ?";
 		string direction;
-		cin >> direction;
+		if (!fullAI)
+		{
+			cin >> direction;
+		}
 
 		// shortcuts
 		if (direction == "q")
@@ -300,6 +343,14 @@ int main() {
 		else if (direction == "l")
 			direction = "look";
 
+		if (direction == "ai" || fullAI || direction == "fullai") {
+			if (direction == "fullai") fullAI = true;
+			std::string reply = ai(fullQuery);
+			std::string aiCommand = extractCommand(reply);
+			cout << "command: '" << aiCommand << "'" << endl;
+			direction = aiCommand;
+		}
+
 		if (direction == "quit") {
 			cout << "Leaving so soon?" << endl;
 			break;
@@ -311,10 +362,10 @@ int main() {
 			cout << "You look around." << endl;
 		} else if (direction == "cheat") {
 			findShortestPath(areas, currentArea, "Goal");
-		} else if (direction == "ai") {
-			std::string direction = ai(fullQuery);
+		} else if (direction == "test") {
+			std::string extractedWord = extractCommand("This is North.  It shouldn't be anything but the word that starts with N.");
+			cout << "extractedWord = " << extractedWord << endl;
 		} else {
-
 			if (areas[currentArea].exits.count(direction)) {
 				currentArea = areas[currentArea].exits[direction];
 			} else {
